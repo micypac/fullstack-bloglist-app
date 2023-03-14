@@ -1,12 +1,17 @@
 module.exports = {
   env: {
+    browser: true,
     node: true,
     commonjs: true,
     es2021: true,
-    jest: true,
+    'jest/globals': true,
+    'cypress/globals': true,
   },
-  extends: 'eslint:recommended',
+  extends: ['eslint:recommended', 'plugin:react/recommended'],
   parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
     ecmaVersion: 'latest',
   },
   rules: {
