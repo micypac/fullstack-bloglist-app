@@ -9,12 +9,10 @@ const api = supertest(app)
 const getToken = async () => {
   const userCredential = {
     username: 'micpac',
-    password: 'godmode'
+    password: 'godmode',
   }
 
-  const response = await api
-    .post('/api/login')
-    .send(userCredential)
+  const response = await api.post('/api/login').send(userCredential)
 
   return response.body.token
 }
@@ -37,27 +35,23 @@ describe('there are initially some blogs saved', () => {
       .expect('Content-Type', /application\/json/)
   }, 100000)
 
-
   test('all blogs are returned', async () => {
     const blogs = await api.get('/api/blogs')
     expect(blogs.body).toHaveLength(helper.initialBlogs.length)
   })
 
-
   test('unique identifier property of blog is named id', async () => {
     const blogs = await api.get('/api/blogs')
-    blogs.body.map(blog => expect(blog.id).toBeDefined())
+    blogs.body.map((blog) => expect(blog.id).toBeDefined())
   })
-
 
   test('a specific blog title is within the returned blogs', async () => {
     const blogs = await helper.blogsInDb()
-    const blogTitles = blogs.map(blog => blog.title)
+    const blogTitles = blogs.map((blog) => blog.title)
 
     expect(blogTitles).toContain('React patterns')
   })
 })
-
 
 describe('addition of blog', () => {
   beforeAll(async () => {
@@ -65,14 +59,13 @@ describe('addition of blog', () => {
   })
 
   test('a valid blog can be added', async () => {
-
     const token = await getToken()
 
     const newBlog = {
       title: 'Miss Komi-unnication',
       author: 'Shuoko Komi',
       url: 'https://komi-san-cant-communicate/',
-      likes: 33
+      likes: 33,
     }
 
     await api
@@ -83,7 +76,7 @@ describe('addition of blog', () => {
       .expect('Content-Type', /application\/json/)
 
     const blogsAtEnd = await helper.blogsInDb()
-    const contents = blogsAtEnd.map(blog => blog.title)
+    const contents = blogsAtEnd.map((blog) => blog.title)
 
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
     expect(contents).toContain('Miss Komi-unnication')
@@ -106,7 +99,9 @@ describe('addition of blog', () => {
       .expect('Content-Type', /application\/json/)
 
     const blogsAtEnd = await helper.blogsInDb()
-    const blogAdded = blogsAtEnd.find(blog => blog.title === 'Miss Komi-unication')
+    const blogAdded = blogsAtEnd.find(
+      (blog) => blog.title === 'Miss Komi-unication'
+    )
     expect(blogAdded.likes).toBe(0)
   })
 
@@ -114,7 +109,7 @@ describe('addition of blog', () => {
     const token = await getToken()
 
     const newBlog = {
-      author: 'Hitohito Tadano'
+      author: 'Hitohito Tadano',
     }
 
     await api
@@ -128,7 +123,6 @@ describe('addition of blog', () => {
   })
 })
 
-
 describe('deletion of a blog', () => {
   beforeAll(async () => {
     await helper.initUserDb()
@@ -141,7 +135,7 @@ describe('deletion of a blog', () => {
       title: 'Test DELETE Blog',
       author: 'tony stark',
       url: 'https://www.example.com/test-delete-blog',
-      likes: 1
+      likes: 1,
     }
 
     await api
@@ -160,15 +154,34 @@ describe('deletion of a blog', () => {
     const blogsAtEnd = await helper.blogsInDb()
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
 
-    const contents = blogsAtEnd.map(blog => blog.title)
+    const contents = blogsAtEnd.map((blog) => blog.title)
     expect(contents).not.toContain(blogToDelete.title)
   })
 })
 
 describe('update likes property of a blog', () => {
+  beforeAll(async () => {
+    await helper.initUserDb()
+  })
+
   test('blog likes can be updated', async () => {
+    const token = await getToken()
+
+    const newBlog = {
+      title: 'Test UPDATE Blog',
+      author: 'Bruce Banner',
+      url: 'https://www.example.com/test-update-blog',
+      likes: 1,
+    }
+
+    await api
+      .post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
+      .send(newBlog)
+
     const blogsAtStart = await helper.blogsInDb()
-    const blogToUpdate = blogsAtStart[0]
+    // const blogToUpdate = blogsAtStart[0]
+    const blogToUpdate = blogsAtStart[blogsAtStart.length - 1]
 
     blogToUpdate.likes = 50
 
@@ -179,12 +192,10 @@ describe('update likes property of a blog', () => {
       .expect('Content-Type', /application\/json/)
 
     const blogsAtEnd = await helper.blogsInDb()
-    const blogUpdated = blogsAtEnd.find(blog => blog.id === blogToUpdate.id)
+    const blogUpdated = blogsAtEnd.find((blog) => blog.id === blogToUpdate.id)
     expect(blogUpdated.likes).toBe(50)
-
   })
 })
-
 
 afterAll(() => {
   mongoose.connection.close()
