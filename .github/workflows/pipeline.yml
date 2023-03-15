@@ -27,12 +27,12 @@ jobs:
         run: npm run build
       - name: test
         run: npm run test
-      # - name: e2e tests
-      #   uses: cypress-io/github-action@v5
-      #   with:
-      #     build: npm run build
-      #     start: npm run start-prod
-      #     wait-on: http://localhost:5001
+      - name: e2e tests
+        uses: cypress-io/github-action@v5
+        with:
+          build: npm run build
+          start: npm run start:test
+          wait-on: http://localhost:3003
       # - name: pre-deployment failure
       #   uses: rjstone/discord-webhook-notify@v1.0.4
       #   if: ${{ failure() }}

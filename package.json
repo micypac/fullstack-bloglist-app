@@ -12,7 +12,8 @@
     "start:test": "NODE_ENV=test node ./server/index.js",
     "start:prod": "NODE_ENV=production node ./server/index.js",
     "test": "NODE_ENV=test jest --runInBand --forceExit",
-    "eslint": "eslint './**/*.{js,jsx}'"
+    "eslint": "eslint './**/*.{js,jsx}'",
+    "test:e2e": "cypress open"
   },
   "keywords": [],
   "author": "Michael Pacleb",
