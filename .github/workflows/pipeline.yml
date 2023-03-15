@@ -18,6 +18,9 @@ jobs:
           node-version: '16'
       - name: npm install
         run: npm install
+      - name: create env file
+        run: |
+          echo "${{ secrets.BACKEND_ENV }}" > .env
       - name: lint
         run: npm run eslint
       - name: build
