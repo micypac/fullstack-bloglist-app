@@ -40,31 +40,31 @@ jobs:
       #     severity: error
       #     details: Pre-deployment check failed
       #     webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-  # deploy:
-  #   if: ${{ github.event_name == 'push' && !contains(join(toJson(github.event.commits.*.message)), '#skip') }}
-  #   needs: pre_deployment_checks
-  #   runs-on: ubuntu-20.04
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: superfly/flyctl-actions/setup-flyctl@master
-  #     - run: flyctl deploy --remote-only
-  #       env:
-  #         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-  # tag_release:
-  #   if: ${{ github.event_name == 'push' && !contains(join(toJson(github.event.commits.*.message)), '#skip') }}
-  #   needs: deploy
-  #   permissions: write-all
-  #   runs-on: ubuntu-20.04
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: '0'
-  #     - name: Bump version and push tag
-  #       uses: anothrNick/github-tag-action@1.61.0
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         DEFAULT_BUMP: 'patch'
-  #         WITH_V: true
+  deploy:
+    if: ${{ github.event_name == 'push' && !contains(join(toJson(github.event.commits.*.message)), '#skip') }}
+    needs: pre_deployment_checks
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  tag_release:
+    if: ${{ github.event_name == 'push' && !contains(join(toJson(github.event.commits.*.message)), '#skip') }}
+    needs: deploy
+    permissions: write-all
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.61.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: 'patch'
+          WITH_V: true
   #     - name: Deployment Success
   #       uses: rjstone/discord-webhook-notify@v1.0.4
   #       if: ${{ success() }}
