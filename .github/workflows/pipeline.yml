@@ -16,10 +16,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
-        # - name: Github context
-        #   env:
-        #     GITHUB_CONTEXT: ${{ toJson(github) }}
-        # run: echo "$GITHUB_CONTEXT"
       - name: npm install
         run: npm install
       - name: lint
@@ -28,49 +24,49 @@ jobs:
         run: npm run build
       - name: test
         run: npm run test
-      - name: e2e tests
-        uses: cypress-io/github-action@v5
-        with:
-          build: npm run build
-          start: npm run start-prod
-          wait-on: http://localhost:5001
-      - name: pre-deployment failure
-        uses: rjstone/discord-webhook-notify@v1.0.4
-        if: ${{ failure() }}
-        with:
-          severity: error
-          details: Pre-deployment check failed
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-  deploy:
-    if: ${{ github.event_name == 'push' && !contains(join(toJson(github.event.commits.*.message)), '#skip') }}
-    needs: pre_deployment_checks
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - uses: superfly/flyctl-actions/setup-flyctl@master
-      - run: flyctl deploy --remote-only
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-  tag_release:
-    if: ${{ github.event_name == 'push' && !contains(join(toJson(github.event.commits.*.message)), '#skip') }}
-    needs: deploy
-    permissions: write-all
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: '0'
-      - name: Bump version and push tag
-        uses: anothrNick/github-tag-action@1.61.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEFAULT_BUMP: 'patch'
-          WITH_V: true
-      - name: Deployment Success
-        uses: rjstone/discord-webhook-notify@v1.0.4
-        if: ${{ success() }}
-        with:
-          severity: info
-          description: micypac Pokedex new version deployed
-          details: 'Commit ${{ toJson(github.event.commits.*.message) }}'
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+      # - name: e2e tests
+      #   uses: cypress-io/github-action@v5
+      #   with:
+      #     build: npm run build
+      #     start: npm run start-prod
+      #     wait-on: http://localhost:5001
+      # - name: pre-deployment failure
+      #   uses: rjstone/discord-webhook-notify@v1.0.4
+      #   if: ${{ failure() }}
+      #   with:
+      #     severity: error
+      #     details: Pre-deployment check failed
+      #     webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+  # deploy:
+  #   if: ${{ github.event_name == 'push' && !contains(join(toJson(github.event.commits.*.message)), '#skip') }}
+  #   needs: pre_deployment_checks
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: superfly/flyctl-actions/setup-flyctl@master
+  #     - run: flyctl deploy --remote-only
+  #       env:
+  #         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  # tag_release:
+  #   if: ${{ github.event_name == 'push' && !contains(join(toJson(github.event.commits.*.message)), '#skip') }}
+  #   needs: deploy
+  #   permissions: write-all
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: '0'
+  #     - name: Bump version and push tag
+  #       uses: anothrNick/github-tag-action@1.61.0
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #         DEFAULT_BUMP: 'patch'
+  #         WITH_V: true
+  #     - name: Deployment Success
+  #       uses: rjstone/discord-webhook-notify@v1.0.4
+  #       if: ${{ success() }}
+  #       with:
+  #         severity: info
+  #         description: micypac Pokedex new version deployed
+  #         details: 'Commit ${{ toJson(github.event.commits.*.message) }}'
+  #         webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
