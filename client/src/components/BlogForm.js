@@ -20,6 +20,7 @@ const BlogForm = (props) => {
   const addBlog = (event) => {
     event.preventDefault()
 
+    // eslint-disable-next-line react/prop-types
     props.createBlog({
       title: title,
       author: author,
